@@ -5,12 +5,12 @@ layers {
   top: "data"
   top: "label"
   data_param {
-    source: "sun_play/sun_training_01_lmdb_0_start"
+    source: "sun_play/sun_training_01_randomized_lmdb"
     backend: LMDB
     batch_size: 50
   }
   transform_param {
-    mean_file: "sun_play/sun_training_01_mean.binaryproto"
+    mean_file: "sun_play/sun_training_01_gpu_mean.binaryproto"
   }
   include: { phase: TRAIN }
 }
@@ -20,12 +20,12 @@ layers {
   top: "data"
   top: "label"
   data_param {
-    source: "sun_play/sun_testing_01_lmdb_0_start"
+    source: "sun_play/sun_testing_01_randomized_lmdb"
     backend: LMDB
     batch_size: 50
   }
   transform_param {
-    mean_file: "sun_play/sun_training_01_mean.binaryproto"
+    mean_file: "sun_play/sun_training_01_gpu_mean.binaryproto"
   }
   include: { phase: TEST }
 }
