@@ -1,0 +1,16 @@
+base_lr: 0.00000001
+lr_policy: "step" 
+gamma: 0.1
+display: 10
+stepsize: 10 #1000
+max_iter: 200 #10000
+momentum: 0.9
+solver_mode: CPU
+net: "models/one_layer_conv.prototxt"  #"models/logisticregression.prototxt"
+snapshot: 10000
+snapshot_prefix: "sun_1_layer_conv_200_total_mean_minus"
+snapshot_diff: true
+snapshot_after_train: true
+test_iter: 100 #1000
+test_interval: 100 #1000
+weight_decay: 0.0005
