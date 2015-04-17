@@ -417,10 +417,10 @@ static mxArray* do_get_layer(int L) {
       memcpy(layer_ptr, layer_blob->cpu_data(),
           sizeof(float) * layer_blob->count());
       break;
-    case Caffe::GPU:
-      CUDA_CHECK(cudaMemcpy(layer_ptr, layer_blob->gpu_data(),
-          sizeof(float) * layer_blob->count(), cudaMemcpyDeviceToHost));
-      break;
+    // case Caffe::GPU:
+    //  CUDA_CHECK(cudaMemcpy(layer_ptr, layer_blob->gpu_data(),
+    //      sizeof(float) * layer_blob->count(), cudaMemcpyDeviceToHost));
+   //  break;
     default:
       LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();
   }
