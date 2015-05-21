@@ -300,9 +300,11 @@ else
 		endif
 	else ifeq ($(OSX), 1)
 		# OS X packages atlas as the vecLib framework
-		BLAS_INCLUDE ?= /System/Library/Frameworks/vecLib.framework/Versions/Current/Headers/
+		# BLAS_INCLUDE ?= /System/Library/Frameworks/vecLib.framework/Versions/Current/Headers/
+		BLAS_INCLUDE ?= /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Headers/
 		LIBRARIES += cblas
-		LDFLAGS += -framework vecLib
+		# LDFLAGS += -framework vecLib
+		LDFLAGS += -framework Accelerate
 	endif
 endif
 INCLUDE_DIRS += $(BLAS_INCLUDE)
@@ -395,6 +397,12 @@ mat$(PROJECT): mat
 
 mat: $(MAT$(PROJECT)_SO)
 
+ifeq ($(OSX), 1)
+  OSXCXXLIBS = "/usr/lib/libstdc++.dylib"
+else
+  OSXCXXLIBS = ""
+endif
+
 $(MAT$(PROJECT)_SO): $(MAT$(PROJECT)_SRC) $(STATIC_NAME)
 	@ if [ -z "$(MATLAB_DIR)" ]; then \
 		echo "MATLAB_DIR must be specified in $(CONFIG_FILE)" \
@@ -404,7 +412,7 @@ $(MAT$(PROJECT)_SO): $(MAT$(PROJECT)_SRC) $(STATIC_NAME)
 	$(MATLAB_DIR)/bin/mex $(MAT$(PROJECT)_SRC) \
 			CXX="$(CXX)" \
 			CXXFLAGS="\$$CXXFLAGS $(MATLAB_CXXFLAGS)" \
-			CXXLIBS="\$$CXXLIBS $(STATIC_NAME) $(LDFLAGS)" -output $@
+			CXXLIBS="\$$CXXLIBS $(STATIC_NAME) $(LDFLAGS) $(OSXCXXLIBS)" -output $@
 	@ echo
 
 runtest: $(TEST_ALL_BIN)
