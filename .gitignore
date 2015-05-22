@@ -94,6 +94,7 @@ docs/dev
 # CMake generated files
 *.gen.cmake
 
+<<<<<<< HEAD
 # LevelDB files
 *.sst
 *.ldb
@@ -101,3 +102,8 @@ LOCK
 LOG*
 CURRENT
 MANIFEST-*
+=======
+sun_play/*
+boost_1_55_0/*
+boost_1_55_build/*
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154

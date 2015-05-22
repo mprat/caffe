@@ -318,6 +318,7 @@ else
 		endif
 	else ifeq ($(OSX), 1)
 		# OS X packages atlas as the vecLib framework
+<<<<<<< HEAD
 		LIBRARIES += cblas
 		# 10.10 has accelerate while 10.9 has veclib
 		XCODE_CLT_VER := $(shell pkgutil --pkg-info=com.apple.pkg.CLTools_Executables | grep -o 'version: 6')
@@ -328,6 +329,13 @@ else
 			BLAS_INCLUDE ?= /System/Library/Frameworks/vecLib.framework/Versions/Current/Headers/
 			LDFLAGS += -framework vecLib
 		endif
+=======
+		# BLAS_INCLUDE ?= /System/Library/Frameworks/vecLib.framework/Versions/Current/Headers/
+		BLAS_INCLUDE ?= /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Accelerate.framework/Versions/Current/Frameworks/vecLib.framework/Headers/
+		LIBRARIES += cblas
+		# LDFLAGS += -framework vecLib
+		LDFLAGS += -framework Accelerate
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
 	endif
 endif
 INCLUDE_DIRS += $(BLAS_INCLUDE)
@@ -440,6 +448,12 @@ mat$(PROJECT): mat
 
 mat: $(MAT$(PROJECT)_SO)
 
+ifeq ($(OSX), 1)
+  OSXCXXLIBS = "/usr/lib/libstdc++.dylib"
+else
+  OSXCXXLIBS = ""
+endif
+
 $(MAT$(PROJECT)_SO): $(MAT$(PROJECT)_SRC) $(STATIC_NAME)
 	@ if [ -z "$(MATLAB_DIR)" ]; then \
 		echo "MATLAB_DIR must be specified in $(CONFIG_FILE)" \
@@ -450,7 +464,12 @@ $(MAT$(PROJECT)_SO): $(MAT$(PROJECT)_SRC) $(STATIC_NAME)
 	$(Q)$(MATLAB_DIR)/bin/mex $(MAT$(PROJECT)_SRC) \
 			CXX="$(CXX)" \
 			CXXFLAGS="\$$CXXFLAGS $(MATLAB_CXXFLAGS)" \
+<<<<<<< HEAD
 			CXXLIBS="\$$CXXLIBS $(STATIC_LINK_COMMAND) $(LDFLAGS)" -output $@
+=======
+			CXXLIBS="\$$CXXLIBS $(STATIC_NAME) $(LDFLAGS) $(OSXCXXLIBS)" -output $@
+	@ echo
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
 
 runtest: $(TEST_ALL_BIN)
 	$(TOOL_BUILD_DIR)/caffe

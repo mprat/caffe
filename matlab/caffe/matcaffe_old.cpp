@@ -3,7 +3,10 @@
 // caffe::Caffe functions so that one could easily call it from matlab.
 // Note that for matlab, we will simply use float as the data type.
 
+<<<<<<< HEAD
 #include <sstream>
+=======
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
 #include <string>
 #include <vector>
 
@@ -13,12 +16,15 @@
 
 #define MEX_ARGS int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs
 
+<<<<<<< HEAD
 // Log and throw a Mex error
 inline void mex_error(const std::string &msg) {
   LOG(ERROR) << msg;
   mexErrMsgTxt(msg.c_str());
 }
 
+=======
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
 using namespace caffe;  // NOLINT(build/namespaces)
 
 // The pointer to the internal caffe::Net instance
@@ -52,6 +58,7 @@ static int init_key = -2;
 // input and outputs a cell array.
 
 static mxArray* do_forward(const mxArray* const bottom) {
+<<<<<<< HEAD
   const vector<Blob<float>*>& input_blobs = net_->input_blobs();
   if (static_cast<unsigned int>(mxGetDimensions(bottom)[0]) !=
       input_blobs.size()) {
@@ -69,6 +76,17 @@ static mxArray* do_forward(const mxArray* const bottom) {
       mex_error(error_msg);
     }
 
+=======
+  vector<Blob<float>*>& input_blobs = net_->input_blobs();
+  CHECK_EQ(static_cast<unsigned int>(mxGetDimensions(bottom)[0]),
+      input_blobs.size());
+  for (unsigned int i = 0; i < input_blobs.size(); ++i) {
+    const mxArray* const elem = mxGetCell(bottom, i);
+    CHECK(mxIsSingle(elem))
+        << "MatCaffe require single-precision float point data";
+    CHECK_EQ(mxGetNumberOfElements(elem), input_blobs[i]->count())
+        << "MatCaffe input size does not match the input size of the network";
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
     const float* const data_ptr =
         reinterpret_cast<const float* const>(mxGetPr(elem));
     switch (Caffe::mode()) {
@@ -81,7 +99,11 @@ static mxArray* do_forward(const mxArray* const bottom) {
           input_blobs[i]->mutable_gpu_data());
       break;
     default:
+<<<<<<< HEAD
       mex_error("Unknown Caffe mode");
+=======
+      LOG(FATAL) << "Unknown Caffe mode.";
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
     }  // switch (Caffe::mode())
   }
   const vector<Blob<float>*>& output_blobs = net_->ForwardPrefilled();
@@ -104,7 +126,11 @@ static mxArray* do_forward(const mxArray* const bottom) {
           data_ptr);
       break;
     default:
+<<<<<<< HEAD
       mex_error("Unknown Caffe mode");
+=======
+      LOG(FATAL) << "Unknown Caffe mode.";
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
     }  // switch (Caffe::mode())
   }
 
@@ -112,12 +138,19 @@ static mxArray* do_forward(const mxArray* const bottom) {
 }
 
 static mxArray* do_backward(const mxArray* const top_diff) {
+<<<<<<< HEAD
   const vector<Blob<float>*>& output_blobs = net_->output_blobs();
   const vector<Blob<float>*>& input_blobs = net_->input_blobs();
   if (static_cast<unsigned int>(mxGetDimensions(top_diff)[0]) !=
       output_blobs.size()) {
     mex_error("Invalid input size");
   }
+=======
+  vector<Blob<float>*>& output_blobs = net_->output_blobs();
+  vector<Blob<float>*>& input_blobs = net_->input_blobs();
+  CHECK_EQ(static_cast<unsigned int>(mxGetDimensions(top_diff)[0]),
+      output_blobs.size());
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
   // First, copy the output diff
   for (unsigned int i = 0; i < output_blobs.size(); ++i) {
     const mxArray* const elem = mxGetCell(top_diff, i);
@@ -133,7 +166,11 @@ static mxArray* do_backward(const mxArray* const top_diff) {
           output_blobs[i]->mutable_gpu_diff());
       break;
     default:
+<<<<<<< HEAD
         mex_error("Unknown Caffe mode");
+=======
+      LOG(FATAL) << "Unknown Caffe mode.";
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
     }  // switch (Caffe::mode())
   }
   // LOG(INFO) << "Start";
@@ -156,7 +193,11 @@ static mxArray* do_backward(const mxArray* const top_diff) {
       caffe_copy(input_blobs[i]->count(), input_blobs[i]->gpu_diff(), data_ptr);
       break;
     default:
+<<<<<<< HEAD
         mex_error("Unknown Caffe mode");
+=======
+      LOG(FATAL) << "Unknown Caffe mode.";
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
     }  // switch (Caffe::mode())
   }
 
@@ -233,7 +274,11 @@ static mxArray* do_get_weights() {
               weights_ptr);
           break;
         default:
+<<<<<<< HEAD
           mex_error("Unknown Caffe mode");
+=======
+          LOG(FATAL) << "Unknown caffe mode: " << Caffe::mode();
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
         }
       }
     }
@@ -254,11 +299,26 @@ static void set_mode_gpu(MEX_ARGS) {
   Caffe::set_mode(Caffe::GPU);
 }
 
+<<<<<<< HEAD
 static void set_device(MEX_ARGS) {
   if (nrhs != 1) {
     ostringstream error_msg;
     error_msg << "Expected 1 argument, got " << nrhs;
     mex_error(error_msg.str());
+=======
+static void set_phase_train(MEX_ARGS) {
+  Caffe::set_phase(Caffe::TRAIN);
+}
+
+static void set_phase_test(MEX_ARGS) {
+  Caffe::set_phase(Caffe::TEST);
+}
+
+static void set_device(MEX_ARGS) {
+  if (nrhs != 1) {
+    LOG(ERROR) << "Only given " << nrhs << " arguments";
+    mexErrMsgTxt("Wrong number of arguments");
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
   }
 
   int device_id = static_cast<int>(mxGetScalar(prhs[0]));
@@ -270,14 +330,21 @@ static void get_init_key(MEX_ARGS) {
 }
 
 static void init(MEX_ARGS) {
+<<<<<<< HEAD
   if (nrhs != 3) {
     ostringstream error_msg;
     error_msg << "Expected 3 arguments, got " << nrhs;
     mex_error(error_msg.str());
+=======
+  if (nrhs != 2) {
+    LOG(ERROR) << "Only given " << nrhs << " arguments";
+    mexErrMsgTxt("Wrong number of arguments");
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
   }
 
   char* param_file = mxArrayToString(prhs[0]);
   char* model_file = mxArrayToString(prhs[1]);
+<<<<<<< HEAD
   char* phase_name = mxArrayToString(prhs[2]);
 
   Phase phase;
@@ -290,11 +357,18 @@ static void init(MEX_ARGS) {
   }
 
   net_.reset(new Net<float>(string(param_file), phase));
+=======
+
+  net_.reset(new Net<float>(string(param_file)));
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
   net_->CopyTrainedLayersFrom(string(model_file));
 
   mxFree(param_file);
   mxFree(model_file);
+<<<<<<< HEAD
   mxFree(phase_name);
+=======
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
 
   init_key = random();  // NOLINT(caffe/random_fn)
 
@@ -313,9 +387,14 @@ static void reset(MEX_ARGS) {
 
 static void forward(MEX_ARGS) {
   if (nrhs != 1) {
+<<<<<<< HEAD
     ostringstream error_msg;
     error_msg << "Expected 1 argument, got " << nrhs;
     mex_error(error_msg.str());
+=======
+    LOG(ERROR) << "Only given " << nrhs << " arguments";
+    mexErrMsgTxt("Wrong number of arguments");
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
   }
 
   plhs[0] = do_forward(prhs[0]);
@@ -323,9 +402,14 @@ static void forward(MEX_ARGS) {
 
 static void backward(MEX_ARGS) {
   if (nrhs != 1) {
+<<<<<<< HEAD
     ostringstream error_msg;
     error_msg << "Expected 1 argument, got " << nrhs;
     mex_error(error_msg.str());
+=======
+    LOG(ERROR) << "Only given " << nrhs << " arguments";
+    mexErrMsgTxt("Wrong number of arguments");
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
   }
 
   plhs[0] = do_backward(prhs[0]);
@@ -346,7 +430,11 @@ static void read_mean(MEX_ARGS) {
     }
     const string& mean_file = mxArrayToString(prhs[0]);
     Blob<float> data_mean;
+<<<<<<< HEAD
     LOG(INFO) << "Loading mean file from: " << mean_file;
+=======
+    LOG(INFO) << "Loading mean file from" << mean_file;
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
     BlobProto blob_proto;
     bool result = ReadProtoFromBinaryFile(mean_file.c_str(), &blob_proto);
     if (!result) {
@@ -380,6 +468,11 @@ static handler_registry handlers[] = {
   { "is_initialized",     is_initialized  },
   { "set_mode_cpu",       set_mode_cpu    },
   { "set_mode_gpu",       set_mode_gpu    },
+<<<<<<< HEAD
+=======
+  { "set_phase_train",    set_phase_train },
+  { "set_phase_test",     set_phase_test  },
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
   { "set_device",         set_device      },
   { "get_weights",        get_weights     },
   { "get_init_key",       get_init_key    },
@@ -394,9 +487,15 @@ static handler_registry handlers[] = {
  ** matlab entry point: caffe(api_command, arg1, arg2, ...)
  **/
 void mexFunction(MEX_ARGS) {
+<<<<<<< HEAD
   mexLock();  // Avoid clearing the mex file.
   if (nrhs == 0) {
     mex_error("No API command given");
+=======
+  if (nrhs == 0) {
+    LOG(ERROR) << "No API command given";
+    mexErrMsgTxt("An API command is requires");
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
     return;
   }
 
@@ -412,9 +511,14 @@ void mexFunction(MEX_ARGS) {
       }
     }
     if (!dispatched) {
+<<<<<<< HEAD
       ostringstream error_msg;
       error_msg << "Unknown command '" << cmd << "'";
       mex_error(error_msg.str());
+=======
+      LOG(ERROR) << "Unknown command `" << cmd << "'";
+      mexErrMsgTxt("API command not recognized");
+>>>>>>> 0571ac9388bb1bbd541b74adbbf737caf6812154
     }
     mxFree(cmd);
   }
